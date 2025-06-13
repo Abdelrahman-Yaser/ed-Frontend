@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const apiClient = axios.create({
-  baseURL: "https://edu-backend-git-main-abdelrahman-yasers-projects.vercel.app",
+  baseURL: "http://localhost:5000",
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
