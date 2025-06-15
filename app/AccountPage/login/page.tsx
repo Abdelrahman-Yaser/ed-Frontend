@@ -23,12 +23,16 @@ export default function LoginPage() {
         password,
       });
 
-      if (response.data.success) {
-        setSuccess(true);
-        localStorage.setItem("token",response.data.accessToken);
-        console.log("Login successful:", response.data);
-        // Handle successful login (e.g., redirect, save token, etc.)
-      } else {
+       if (response.data.success) {
+  const user = {
+    id: response.data.user._id, // أو حسب اسم المتغير من الباك
+    role: response.data.user.role,
+    token: response.data.accessToken,
+  };
+
+  localStorage.setItem("user", JSON.stringify(user));
+  setSuccess(true);
+}else {
         setError("Login failed. Please try again.");
       }
     } catch (err: any) {
