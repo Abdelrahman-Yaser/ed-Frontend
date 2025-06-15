@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AxiosInstance from '../../axios/axios';
+import type { FormEvent } from 'react';
 
 export default function CreatePost() {
   const [title, setTitle] = useState('');
@@ -12,10 +13,10 @@ export default function CreatePost() {
 
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!title || !content) {
+    if (!title.trim() || !content.trim()) {
       setError('Title and content are required.');
       return;
     }
@@ -25,9 +26,9 @@ export default function CreatePost() {
 
     try {
       await AxiosInstance.post('/posts/create', { title, content });
-      router.push('/posts'); // 🔁 redirect to posts page
-    } catch (err) {
-      console.error(err);
+      router.push('/posts');
+    } catch (err: any) {
+      console.error('Create Post Error:', err);
       setError(err.response?.data?.message || '❌ Failed to create post.');
     } finally {
       setLoading(false);
@@ -36,42 +37,58 @@ export default function CreatePost() {
 
   return (
     <div className="relative min-h-screen bg-gray-900 text-white">
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
 
       <div className="container mx-auto px-4 py-16 relative z-10">
         <h1 className="text-3xl font-bold text-center mb-8">Create New Post</h1>
 
         <div className="bg-white text-black rounded-lg p-8 shadow-lg max-w-lg mx-auto">
-          {error && <p className="text-red-500 mb-4">{error}</p>}
+          {error && (
+            <div
+              className="text-red-600 font-medium mb-4 border border-red-300 bg-red-100 px-4 py-2 rounded"
+              role="alert"
+            >
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
-            {/* Post Title */}
+            {/* Title */}
             <div className="mb-4">
-              <label htmlFor="postTitle" className="block font-medium mb-1">Post Title</label>
+              <label htmlFor="postTitle" className="block font-semibold mb-1">
+                Post Title
+              </label>
               <input
-                type="text"
                 id="postTitle"
+                type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter post title"
                 required
+                aria-required="true"
               />
             </div>
 
-            {/* Post Content */}
+            {/* Content */}
             <div className="mb-6">
-              <label htmlFor="postContent" className="block font-medium mb-1">Post Content</label>
+              <label htmlFor="postContent" className="block font-semibold mb-1">
+                Post Content
+              </label>
               <textarea
                 id="postContent"
                 rows={5}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Write your post content here..."
                 required
+                aria-required="true"
               />
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}

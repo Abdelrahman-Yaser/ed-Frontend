@@ -15,13 +15,16 @@ const Courses: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const fetchCourses = async () => {
     const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
+    const role = localStorage.getItem('userRole');
+
+    if (role) {
+      setUserRole(role);
     }
+
     try {
       const response = await AxiosInstance.get('/courses');
       const data = response.data;
@@ -64,11 +67,13 @@ const Courses: React.FC = () => {
   if (loading) return <p className="text-center text-gray-500 py-6">Loading courses...</p>;
   if (error) return <p className="text-center text-red-600 py-6">{error}</p>;
 
+  const isAdmin = userRole === 'admin';
+
   return (
     <div className="min-h-screen bg-gray-100 px-6 py-10">
       <h1 className="text-3xl font-bold text-center mb-8">Available Courses</h1>
 
-      {isAuthenticated && (
+      {isAdmin && (
         <div className="mb-4">
           <Link
             href="/courses/createCourse"
@@ -81,18 +86,29 @@ const Courses: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => (
-          <div key={course._id} className="bg-white rounded-lg shadow p-6 hover:shadow-md transition relative">
+          <div
+            key={course._id}
+            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition relative"
+          >
             <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
             <p className="text-gray-700">{course.description}</p>
             <p className="mt-2 font-semibold">{course.price} $</p>
 
-            {isAuthenticated && (
-              <button
-                onClick={() => handleDelete(course._id)}
-                className="absolute top-2 right-2 text-sm bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-              >
-                Delete
-              </button>
+            {isAdmin && (
+              <div className="absolute top-2 right-2 space-x-2">
+                <button
+                  onClick={() => handleDelete(course._id)}
+                  className="text-sm bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                >
+                  Delete
+                </button>
+                <Link
+                  href={`/courses/editCourse/${course._id}`}
+                  className="text-sm bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                >
+                  Edit
+                </Link>
+              </div>
             )}
           </div>
         ))}

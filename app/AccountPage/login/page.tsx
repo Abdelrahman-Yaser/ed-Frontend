@@ -12,54 +12,59 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Check login state on mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
       setSuccess(true);
     }
   }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
 
-    try {
-      const response = await AxiosInstance.post("/auth/login", {
-        email,
-        password,
-      });
+  try {
+    const response = await AxiosInstance.post("/auth/login", {
+      email,
+      password,
+    });
 
-      if (response.data.success) {
-        localStorage.setItem("token", response.data.accessToken);
-        setSuccess(true);
-        console.log("Login successful:", response.data);
-      } else {
-        setError("Login failed. Please try again.");
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred");
-    } finally {
-      setLoading(false);
+    if (response.data.success) {
+      const user = {
+        id: response.data.user._id,
+        role: response.data.user.role?.toLowerCase(),
+        email: response.data.user.email,
+      };
+
+      localStorage.setItem("accessToken", response.data.accessToken);
+      localStorage.setItem("userRole", user.role);
+      localStorage.setItem("userId", user.id);
+      localStorage.setItem("userEmail", user.email);
+
+      setSuccess(true);
+    } else {
+      setError("Login failed. Please try again.");
     }
-  };
+  } catch (err: any) {
+    setError(err.response?.data?.message || "An error occurred");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="container mx-auto mt-5 flex flex-col justify-center items-center">
-      {/* Logo */}
       <div className="mb-4 text-center">
         <Link href="/AccountPage" className="text-3xl font-bold text-gray-800 flex items-center">
           ConnectEDU
         </Link>
       </div>
 
-      {/* Site Brief */}
       <div className="text-center mb-4 text-lg text-gray-700">
         A platform to connect learners, alumni, and educators for easier learning.
       </div>
 
-      {/* Authenticated view */}
       {success ? (
         <div className="text-center text-green-600">
           <p className="mb-4">You are logged in!</p>
@@ -72,7 +77,6 @@ export default function LoginPage() {
           {error && <div className="text-center text-red-500 mb-4">{error}</div>}
 
           <form onSubmit={handleLogin}>
-            {/* Email */}
             <div className="mb-4">
               <label htmlFor="email" className="block text-gray-700 font-medium mb-1">
                 Email address
@@ -88,7 +92,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Password */}
             <div className="mb-4">
               <label htmlFor="password" className="block text-gray-700 font-medium mb-1">
                 Password
@@ -104,7 +107,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Remember Me */}
             <div className="mb-4 flex items-center">
               <input type="checkbox" id="rememberMe" className="mr-2" />
               <label htmlFor="rememberMe" className="text-gray-700">
@@ -112,7 +114,6 @@ export default function LoginPage() {
               </label>
             </div>
 
-            {/* Login Button */}
             <button
               type="submit"
               disabled={loading}
@@ -121,7 +122,6 @@ export default function LoginPage() {
               {loading ? "Logging in..." : "Login"}
             </button>
 
-            {/* Forgot Password */}
             <div className="mt-3 text-center">
               <Link href="/AccountPage/forgetPassword" className="text-blue-500 hover:underline">
                 Forgot password?
@@ -129,7 +129,6 @@ export default function LoginPage() {
             </div>
           </form>
 
-          {/* Register Link */}
           <div className="mt-4 text-center">
             <p className="text-gray-700">
               Don't have an account?{" "}

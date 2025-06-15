@@ -118,19 +118,7 @@ export default function CreateCourse() {
               />
             </div>
 
-            <div className="mb-6">
-              <label htmlFor="image" className="block font-medium mb-1">
-                Image URL
-              </label>
-              <input
-                type="text"
-                id="image"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+
 
             <button
               type="submit"

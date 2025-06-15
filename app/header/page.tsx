@@ -7,7 +7,7 @@ import { useState } from "react";
 const navLinks = [
   { name: "Courses", path: "/courses" },
   { name: "Posts", path: "/posts" },
-  { name: "Article", path: "/createArticle/viewArticle" },
+  { name: "Article", path: "/article" },
   { name: "About Us", path: "/about" },
   { name: "My Profile", path: "/AccountPage" },
 
