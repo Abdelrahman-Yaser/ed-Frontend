@@ -13,7 +13,7 @@ export default function Article() {
     const fetchArticles = async () => {
       setLoading(true);
       try {
-        const response = await AxiosInstance.get('/articles'); // تأكد من اسم الـ endpoint
+        const response = await AxiosInstance.get('/articles' ); // تأكد من اسم الـ endpoint
         const data = Array.isArray(response.data.articles) ? response.data.articles : [];
         setArticles(data);
         console.log('Articles:', response.data);
