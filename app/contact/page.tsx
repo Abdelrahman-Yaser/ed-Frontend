@@ -1,10 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('userEmail');
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+    }
+  }, []);
 
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -17,8 +25,6 @@ export default function ContactPage() {
 
   return (
     <>
-      {/* Contact Section */}
-
       {/* Hero Section */}
       <section className="hero-section text-center text-white py-20 bg-blue-600 relative z-10">
         <div className="container mx-auto px-4">
@@ -26,12 +32,21 @@ export default function ContactPage() {
           <p className="text-xl mb-6">
             A platform to connect learners, alumni, and educators for easier learning and collaboration.
           </p>
-          <Link href="/AccountPage/register" className="btn bg-white text-blue-600 px-6 py-3 rounded-lg text-lg mr-4 hover:bg-gray-100">
-            Sign Up
-          </Link>
-          <Link href="/AccountPage/" className="btn border border-white px-6 py-3 rounded-lg text-lg hover:bg-white hover:text-gray-800">
-            Login
-          </Link>
+
+          {!userEmail ? (
+            <>
+              <Link href="/AccountPage/register" className="btn bg-white text-blue-600 px-6 py-3 rounded-lg text-lg mr-4 hover:bg-gray-100">
+                Sign Up
+              </Link>
+              <Link href="/AccountPage" className="btn border border-white px-6 py-3 rounded-lg text-lg hover:bg-white hover:text-gray-800">
+                Login
+              </Link>
+            </>
+          ) : (
+            <p className="text-lg mt-4 bg-white text-blue-700 inline-block px-6 py-3 rounded-xl font-medium">
+              Welcome, {userEmail}
+            </p>
+          )}
         </div>
       </section>
 

@@ -21,11 +21,26 @@ export default function CreatePost() {
       return;
     }
 
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setError('You must be logged in to create a post.');
+      return;
+    }
+
     setError('');
     setLoading(true);
 
     try {
-      await AxiosInstance.post('/posts/create', { title, content });
+      await AxiosInstance.post(
+        '/posts/create',
+        { title, content },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       router.push('/posts');
     } catch (err: any) {
       console.error('Create Post Error:', err);
@@ -45,10 +60,7 @@ export default function CreatePost() {
 
         <div className="bg-white text-black rounded-lg p-8 shadow-lg max-w-lg mx-auto">
           {error && (
-            <div
-              className="text-red-600 font-medium mb-4 border border-red-300 bg-red-100 px-4 py-2 rounded"
-              role="alert"
-            >
+            <div className="text-red-600 font-medium mb-4 border border-red-300 bg-red-100 px-4 py-2 rounded" role="alert">
               {error}
             </div>
           )}
@@ -67,7 +79,6 @@ export default function CreatePost() {
                 className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter post title"
                 required
-                aria-required="true"
               />
             </div>
 
@@ -84,7 +95,6 @@ export default function CreatePost() {
                 className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Write your post content here..."
                 required
-                aria-required="true"
               />
             </div>
 

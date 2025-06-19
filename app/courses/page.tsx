@@ -11,24 +11,52 @@ interface Course {
   price: string;
 }
 
+const CourseCard: React.FC<{
+  course: Course;
+  isAdmin: boolean;
+  onDelete: (id: string) => void;
+}> = ({ course, isAdmin, onDelete }) => (
+  <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition relative">
+    <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
+    <p className="text-gray-700">{course.description}</p>
+    <p className="mt-2 font-semibold">{course.price} $</p>
+
+    {isAdmin && (
+      <div className="absolute top-2 right-2 space-x-2">
+        <button
+          onClick={() => onDelete(course._id)}
+          className="text-sm bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+        >
+          Delete
+        </button>
+        <Link
+          href={`/courses/editCourse/${course._id}`}
+          className="text-sm bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+        >
+          Edit
+        </Link>
+      </div>
+    )}
+  </div>
+);
+
 const Courses: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [userRole, setUserRole] = useState<string | null>(null);
 
-  const fetchCourses = async () => {
+  useEffect(() => {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('userRole');
+    if (role) setUserRole(role);
+    fetchCourses();
+  }, []);
 
-    if (role) {
-      setUserRole(role);
-    }
-
+  const fetchCourses = async () => {
     try {
       const response = await AxiosInstance.get('/courses');
       const data = response.data;
-
       const courseList = Array.isArray(data)
         ? data
         : Array.isArray(data.courses)
@@ -43,10 +71,6 @@ const Courses: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
   const handleDelete = async (id: string) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this course?');
     if (!confirmDelete) return;
@@ -58,16 +82,18 @@ const Courses: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
       setCourses((prev) => prev.filter((course) => course._id !== id));
+      alert('Course deleted successfully');
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to delete course');
     }
   };
 
+  const isAdmin = userRole === 'admin';
+
   if (loading) return <p className="text-center text-gray-500 py-6">Loading courses...</p>;
   if (error) return <p className="text-center text-red-600 py-6">{error}</p>;
-
-  const isAdmin = userRole === 'admin';
 
   return (
     <div className="min-h-screen bg-gray-100 px-6 py-10">
@@ -85,34 +111,20 @@ const Courses: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => (
-          <div
-            key={course._id}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition relative"
-          >
-            <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
-            <p className="text-gray-700">{course.description}</p>
-            <p className="mt-2 font-semibold">{course.price} $</p>
-
-            {isAdmin && (
-              <div className="absolute top-2 right-2 space-x-2">
-                <button
-                  onClick={() => handleDelete(course._id)}
-                  className="text-sm bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                >
-                  Delete
-                </button>
-                <Link
-                  href={`/courses/editCourse/${course._id}`}
-                  className="text-sm bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
-                >
-                  Edit
-                </Link>
-              </div>
-            )}
-          </div>
-        ))}
+        {courses.length === 0 ? (
+          <p className="text-center text-gray-600 col-span-full">No courses available.</p>
+        ) : (
+          courses.map((course) => (
+            <CourseCard
+              key={course._id}
+              course={course}
+              isAdmin={isAdmin}
+              onDelete={handleDelete}
+            />
+          ))
+        )}
       </div>
+
     </div>
   );
 };

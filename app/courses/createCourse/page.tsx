@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import AxiosInstance from '../../axios/axios'; // Adjust path as needed
 import { useRouter } from 'next/navigation';
+import AxiosInstance from '../../axios/axios'; // Adjust path as needed
 
 export default function CreateCourse() {
   const router = useRouter();
@@ -12,7 +12,6 @@ export default function CreateCourse() {
     title: '',
     description: '',
     price: '',
-    image: '',
   });
 
   const [error, setError] = useState('');
@@ -28,12 +27,12 @@ export default function CreateCourse() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.description || !formData.price || !formData.image) {
+    if (!formData.title || !formData.description || !formData.price) {
       setError('Please fill out all fields.');
       return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token) {
       setError('You must be logged in to create a course.');
       return;
@@ -43,15 +42,8 @@ export default function CreateCourse() {
       setLoading(true);
       await AxiosInstance.post(
         '/courses/create',
-        {
-          ...formData,
-          price: Number(formData.price),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { ...formData, price: Number(formData.price) },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       router.push('/courses');
     } catch (err: any) {
@@ -104,7 +96,7 @@ export default function CreateCourse() {
               />
             </div>
 
-            <div className="mb-4">
+            <div className="mb-6">
               <label htmlFor="price" className="block font-medium mb-1">
                 Price
               </label>
@@ -117,8 +109,6 @@ export default function CreateCourse() {
                 className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
-
 
             <button
               type="submit"
