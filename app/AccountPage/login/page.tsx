@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import AxiosInstance from "../../axios/axios";
 import Logout from "../logout/logout.js"; // Ensure this exists and is valid
-
+import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
+const router = useRouter();
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -42,7 +42,10 @@ const handleLogin = async (e: React.FormEvent) => {
       localStorage.setItem("userId", user.id);
       localStorage.setItem("userEmail", user.email);
 
-      setSuccess(true);
+setSuccess(true);
+setTimeout(() => {
+  router.push("/contact");
+}, 100); // ✅ تأخير بسيط 100ms
     } else {
       setError("Login failed. Please try again.");
     }
