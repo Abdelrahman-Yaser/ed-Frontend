@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import AxiosInstance from '../../axios/axios';
 import Logout from '../logout/logout.js'; // Ensure this is a valid React component
-
+import { useRouter } from "next/navigation";
 export default function RequestRegistrationPage() {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -12,7 +12,7 @@ export default function RequestRegistrationPage() {
     password: '',
     confirmPassword: '',
   });
-
+const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -42,6 +42,9 @@ export default function RequestRegistrationPage() {
 
       console.log('Registration successful:', response.data);
       setSuccess('Registration successful!');
+setTimeout(() => {
+  router.push("/contact"); // أو أي صفحة تانية تحب تروح لها
+}, 100);
     } catch (err: any) {
       console.error(err);
       setError(err.response?.data?.message || 'Registration failed.');
